@@ -1,6 +1,8 @@
 Config = {}
 
 Config.Main = {
+    useTarget = true, -- Set to false if you don't want to use the target system, but text system instead.
+    targetSystem = 'ox_target', -- Currently only ox_target, but you can add more if you want, if you need help join or discord via https://discord.gg(simplified or https://discord.gg/7YHRdV9San
     Locations = {
         ["jobcenter"] = {
             coords = vector4(-269.19, -956.09, 31.22, 206.34),

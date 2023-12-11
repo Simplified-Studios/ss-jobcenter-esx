@@ -1,17 +1,4 @@
-Config = {
-    Locations = {
-        ["jobcenter"] = {
-            coords = vector4(-269.19, -956.09, 31.22, 206.34),
-            model = "s_m_m_armoured_01",
-            blip = {
-                sprite = 407,
-                color = 4,
-                scale = 0.7,
-                label = "Job Center",
-            },
-        },
-    }
-}
+Config = {}
 
 RegisterNetEvent('ss-jobcenter:client:setup', function(cfg)
     Config = cfg
@@ -36,11 +23,24 @@ RegisterNetEvent('ss-jobcenter:client:setup', function(cfg)
         FreezeEntityPosition(ped, true)
         SetEntityInvincible(ped, true)
         SetBlockingOfNonTemporaryEvents(ped, true)
+
+        if Config.useTarget then
+            if not Config.targetSystem then
+                print('You need to set a target system in the config if you want to use it.')
+            elseif Config.targetSystem == 'ox_target' then
+                exports.ox_target:addLocalEntity(ped,{
+                    name = 'jobcenter_menu',
+                    serverEvent = 'ss-jobcenter:server:openJobCenter',
+                    icon = 'fa-solid fa-suitcase',
+                    label = 'Open job center'
+                })
+            end
+        end
     end
 end)
 
 CreateThread(function()
-    while Config.Locations do
+    while not Config.useTarget do
         local sleep = 1500
         local currentShop = nil
         for k, v in pairs(Config.Locations) do
