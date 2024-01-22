@@ -1,4 +1,4 @@
-## ss-jobcenter-qb
+## ss-jobcenter-esx
 
 # How to Use
 * Configure `Config.useTarget` to your needs, `'qb'` `'ox'` or `'lib'` based on your resources.
