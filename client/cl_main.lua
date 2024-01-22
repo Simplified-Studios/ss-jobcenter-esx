@@ -1,29 +1,20 @@
 Config = {}
+local zones = {}
 
 RegisterNetEvent('ss-jobcenter:client:setup', function(cfg)
     Config = cfg
-
     for k, v in pairs(Config.Locations) do
-        local blip = AddBlipForCoord(v.coords)
-        SetBlipSprite(blip, v.blip.sprite)
-        SetBlipDisplay(blip, 4)
-        SetBlipScale(blip, v.blip.scale)
-        SetBlipColour(blip, v.blip.color)
-        SetBlipAsShortRange(blip, true)
-        BeginTextCommandSetBlipName("STRING")
-        AddTextComponentString(v.blip.label)
-        EndTextCommandSetBlipName(blip)
-
         RequestModel(v.model)
         while not HasModelLoaded(v.model) do
             Wait(1)
         end
-        ped = CreatePed(4, v.model, v.coords.x, v.coords.y, v.coords.z-1, v.coords.w, false, true)
+        local ped = CreatePed(4, v.model, v.coords.x, v.coords.y, v.coords.z - 1, v.coords.w, false, true)
+        PlaceObjectOnGroundProperly(ped)
         SetEntityHeading(ped, v.coords.w)
-        FreezeEntityPosition(ped, true)
         SetEntityInvincible(ped, true)
         SetBlockingOfNonTemporaryEvents(ped, true)
-
+        SetModelAsNoLongerNeeded(v.model)
+        FreezeEntityPosition(ped, true)
         if Config.useTarget then
             if not Config.targetSystem then
                 print('You need to set a target system in the config if you want to use it.')
@@ -36,6 +27,16 @@ RegisterNetEvent('ss-jobcenter:client:setup', function(cfg)
                 })
             end
         end
+
+        local blip = AddBlipForCoord(v.coords.x, v.coords.y, v.coords.z)
+        SetBlipSprite(blip, 407)
+        SetBlipDisplay(blip, 4)
+        SetBlipScale(blip, 0.7)
+        SetBlipColour(blip, 0)
+        SetBlipAsShortRange(blip, true)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentString("Job Center")
+        EndTextCommandSetBlipName(blip)
     end
 end)
 
@@ -67,8 +68,8 @@ RegisterNetEvent('ss-jobcenter:client:openJobCenter', function(config)
     SetNuiFocus(true, true)
 end)
 
-RegisterNUICallback('startJob', function(data, cb)
-    TriggerServerEvent('ss-jobcenter:server:startJob', data.rank)
+RegisterNUICallback('select', function(data, cb)
+    TriggerServerEvent('ss-jobcenter:server:select', data)
     SetNuiFocus(false, false)
     cb('ok')
 end)
@@ -76,4 +77,10 @@ end)
 RegisterNUICallback('close', function(data, cb)
     SetNuiFocus(false, false)
     cb('ok')
+end)
+
+AddEventHandler('onResourceStart', function(resourceName)
+    if GetCurrentResourceName() == resourceName then
+        TriggerServerEvent('ss-jobcenter:server:setup')
+    end
 end)

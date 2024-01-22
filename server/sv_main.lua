@@ -1,37 +1,72 @@
+QBCore = exports['qb-core']:GetCoreObject()
+
 RegisterNetEvent('ss-jobcenter:server:openJobCenter', function()
     local source = source
     TriggerClientEvent('ss-jobcenter:client:openJobCenter', source, Config)
+end)
+
+RegisterNetEvent('ss-jobcenter:server:setup', function()
+    TriggerClientEvent('ss-jobcenter:client:setup', source, Config.Main)
 end)
 
 RegisterNetEvent('esx:playerLoaded', function(player, xPlayer, isNew)
     TriggerClientEvent('ss-jobcenter:client:setup', player, Config.Main)
 end)
 
-RegisterNetEvent('ss-jobcenter:server:startJob', function(job)
+RegisterNetEvent('ss-jobcenter:server:select', function(data)
     local source = source
     local Player = ESX.GetPlayerFromId(source)
+    local playerCoords = GetEntityCoords(GetPlayerPed(source))
 
-    local jobExists = false
-    for k, v in pairs(Config.Jobs) do
-        if v.rank == job then
-            jobExists = true
-        end
-    end
+    for _, location in pairs(Config.Main.Locations) do
+        local distance = #(playerCoords - vector3(location.coords.x, location.coords.y, location.coords.z))
 
-    for k,v in pairs(Config.Main.Locations) do
-        if #(GetEntityCoords(GetPlayerPed(source)) - vector3(v.coords.x, v.coords.y, v.coords.z)) < 10.0 then
-            if jobExists then
-                if ESX.DoesJobExist(job, 0) then 
-                    Player.setJob(job, 0)
-                    Player.showNotification('You have been hired as a '..job..'!')
+        if distance < 3.5 then
+            if data.type == 'job' then
+                local jobExists = false
+
+                for _, job in pairs(Config.Jobs) do
+                    if job.rank == data.job then
+                        jobExists = true
+                        break
+                    end
+                end
+
+                if jobExists then
+                    if ESX.DoesJobExist(job, 0) then 
+                        Player.setJob(job, 0)
+                        Player.showNotification('You have been hired as a '..job..'!')
+                    else
+                        Player.showNotification('Job or Grade does not exsist in database!')
+                    end
                 else
                     Player.showNotification('Job or Grade does not exsist in database!')
                 end
-            else
-                Player.showNotification('This job does not exist!')
+            elseif data.type == 'license' then
+                local licenseExists = false
+                local license = nil
+
+                for _, l in pairs(Config.Licenses) do
+                    if l.name == data.license.name then
+                        licenseExists = true
+                        license = l
+                        break
+                    end
+                end
+
+                if licenseExists and license.item == data.license.item and license.price == data.license.price then
+                    if Player.getMoney() >= license.price then
+                        Player.removeMoney(license.price)
+                        TriggerEvent('esx_license:addLicense', source, license.item, function()
+                            Player.showNotification('You have been granted a '..license.name..' license!')
+                        end)
+                    end
+                else
+                    Player.showNotification('WRONG? CONTACT ADMIN')
+                end
             end
         else
-            Player.showNotification('You are not near the job center!')
+            Player.showNotification('You are not at the job center!')
         end
     end
 end)
