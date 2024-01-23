@@ -1,5 +1,3 @@
-QBCore = exports['qb-core']:GetCoreObject()
-
 RegisterNetEvent('ss-jobcenter:server:openJobCenter', function()
     local source = source
     TriggerClientEvent('ss-jobcenter:client:openJobCenter', source, Config)
