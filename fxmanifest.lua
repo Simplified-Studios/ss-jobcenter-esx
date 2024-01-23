@@ -6,7 +6,10 @@ version '1.2.0'
 
 ui_page 'html/index.html'
 
-shared_script '@es_extended/imports.lua'
+shared_scripts {
+    '@es_extended/imports.lua',
+    '@ox_lib/init.lua',
+}
 
 client_scripts {
     'client/cl_main.lua',

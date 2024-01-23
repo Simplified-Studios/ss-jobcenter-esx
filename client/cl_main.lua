@@ -18,7 +18,7 @@ RegisterNetEvent('ss-jobcenter:client:setup', function(cfg)
         if Config.useTarget then
             if not Config.targetSystem then
                 print('You need to set a target system in the config if you want to use it.')
-            elseif Config.targetSystem == 'ox_target' then
+            elseif Config.targetSystem == 'ox' then
                 exports.ox_target:addLocalEntity(ped,{
                     name = 'jobcenter_menu',
                     serverEvent = 'ss-jobcenter:server:openJobCenter',
@@ -44,15 +44,17 @@ CreateThread(function()
     while not Config.useTarget do
         local sleep = 1500
         local currentShop = nil
-        for k, v in pairs(Config.Locations) do
-            local ped = PlayerPedId()
-            local pedCoords = GetEntityCoords(ped)
-            local dist = GetDistanceBetweenCoords(pedCoords, v.coords, true)
-            if dist < 5.0 then
-                sleep = 5
-                ESX.ShowHelpNotification('Press ~INPUT_PICKUP~ to open the job center.')
-                if IsControlJustPressed(0, 38) then
-                    TriggerServerEvent('ss-jobcenter:server:openJobCenter')
+        if Config.Locations ~= nil then
+            for k, v in pairs(Config.Locations) do
+                local ped = PlayerPedId()
+                local pedCoords = GetEntityCoords(ped)
+                local dist = GetDistanceBetweenCoords(pedCoords, v.coords, true)
+                if dist < 5.0 then
+                    sleep = 5
+                    ESX.ShowHelpNotification('Press ~INPUT_PICKUP~ to open the job center.')
+                    if IsControlJustPressed(0, 38) then
+                        TriggerServerEvent('ss-jobcenter:server:openJobCenter')
+                    end
                 end
             end
         end

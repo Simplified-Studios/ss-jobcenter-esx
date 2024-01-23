@@ -1,5 +1,3 @@
-QBCore = exports['qb-core']:GetCoreObject()
-
 RegisterNetEvent('ss-jobcenter:server:openJobCenter', function()
     local source = source
     TriggerClientEvent('ss-jobcenter:client:openJobCenter', source, Config)
@@ -33,9 +31,9 @@ RegisterNetEvent('ss-jobcenter:server:select', function(data)
                 end
 
                 if jobExists then
-                    if ESX.DoesJobExist(job, 0) then 
-                        Player.setJob(job, 0)
-                        Player.showNotification('You have been hired as a '..job..'!')
+                    if ESX.DoesJobExist(data.job, 0) then 
+                        Player.setJob(data.job, 0)
+                        Player.showNotification('You have been hired as a '..data.job..'!')
                     else
                         Player.showNotification('Job or Grade does not exsist in database!')
                     end
@@ -60,6 +58,8 @@ RegisterNetEvent('ss-jobcenter:server:select', function(data)
                         TriggerEvent('esx_license:addLicense', source, license.item, function()
                             Player.showNotification('You have been granted a '..license.name..' license!')
                         end)
+                    else
+                        Player.showNotification('You do not have enough money!')
                     end
                 else
                     Player.showNotification('WRONG? CONTACT ADMIN')
